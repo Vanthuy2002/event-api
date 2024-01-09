@@ -25,6 +25,9 @@ export class EventsController {
     return this.eventService.findById(id)
   }
 
+  // only work when off global validate
+  // @Body(new ValidationPipe({ groups: ['create'] })) body: CreateEvents
+  // @Body(new ValidationPipe({ groups: ['update'] })) body: UpdateEvents
   @Post('/create')
   createNew(@Body() body: CreateEvent) {
     return this.eventService.create(body)
