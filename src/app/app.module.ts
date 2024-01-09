@@ -7,7 +7,6 @@ import { Events } from 'src/events/events.entity'
 
 @Module({
   imports: [
-    EventsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -17,8 +16,10 @@ import { Events } from 'src/events/events.entity'
       database: 'nest-events',
       entities: [Events],
       synchronize: true
-    })
+    }),
+    EventsModule
   ],
+
   controllers: [AppController],
   providers: [AppService]
 })
