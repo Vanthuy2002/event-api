@@ -7,7 +7,6 @@ import { AppJapanService } from './app.japanese'
 import { AppDummy } from './app.dummy'
 import { ConfigModule } from '@nestjs/config'
 import ormConfig from 'src/config/orm.config'
-import ormConfigProd from 'src/config/orm.config.prod'
 
 @Module({
   imports: [
@@ -17,8 +16,7 @@ import ormConfigProd from 'src/config/orm.config.prod'
       expandVariables: true
     }),
     TypeOrmModule.forRootAsync({
-      useFactory:
-        process.env.NODE_ENV === 'production' ? ormConfigProd : ormConfig
+      useFactory: ormConfig
     }),
     EventsModule
   ],

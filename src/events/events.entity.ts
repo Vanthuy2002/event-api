@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
+import { Attendee } from './attendee.entity'
 
 @Entity()
 export class Events {
@@ -22,6 +24,9 @@ export class Events {
 
   @Column('date')
   when: Date
+
+  @OneToMany(() => Attendee, (invite) => invite.event)
+  invitee: Attendee[]
 
   @CreateDateColumn()
   createdAt?: Date

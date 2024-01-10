@@ -23,6 +23,11 @@ export class EventsController {
     return this.eventService.findAll()
   }
 
+  @Get('practive')
+  async findWithRelation(@Body() body: any) {
+    return this.eventService.getPrative(body.id)
+  }
+
   @Get(':id')
   findById(@Param('id', ParseIntPipe) id: number) {
     return this.eventService.findById(id)

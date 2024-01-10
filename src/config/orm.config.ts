@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config'
 import { TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { Attendee } from 'src/events/attendee.entity'
 import { Events } from 'src/events/events.entity'
 
 export default registerAs(
@@ -11,7 +12,7 @@ export default registerAs(
     port: Number(process.env.DB_PORT),
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [Events],
-    synchronize: true
+    entities: [Events, Attendee],
+    synchronize: process.env.NODE_ENV === 'production' ? false : true
   })
 )

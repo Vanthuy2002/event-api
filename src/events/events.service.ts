@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
-import { Repository } from 'typeorm'
+import { FindOptionsSelect, Repository } from 'typeorm'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
+
+const inCludeFields = ['name', 'addr', 'id', 'description', 'invitee']
 
 @Injectable()
 export class EventsService {
@@ -13,7 +15,9 @@ export class EventsService {
   ) {}
 
   async findAll() {
-    const events = await this.repo.find({})
+    const events = await this.repo.find({
+      select: inCludeFields as FindOptionsSelect<Events>
+    })
     return {
       message: messageResponse.GET_ALL_EVENT,
       events
@@ -21,7 +25,10 @@ export class EventsService {
   }
 
   async findById(id: number) {
-    const event = await this.repo.findOneBy({ id })
+    const event = await this.repo.findOne({
+      where: { id },
+      select: inCludeFields as FindOptionsSelect<Events>
+    })
     if (!event) {
       throw new NotFoundException(messageResponse.NOT_FOUND__EVENT)
     }
@@ -51,5 +58,26 @@ export class EventsService {
     return {
       message: messageResponse.REMOVE_EVENT
     }
+  }
+
+  async getPrative(id: string) {
+    const ids = Number(id)
+    const event = await this.repo.findOne({
+      where: { id: ids },
+      relations: ['invitee'],
+      select: {
+        // Chọn trường cho bảng Event
+        id: true,
+        name: true,
+        description: true,
+        addr: true,
+        // Chọn trường cho bảng Invitee
+        invitee: {
+          id: true,
+          name: true
+        }
+      }
+    })
+    return event
   }
 }
