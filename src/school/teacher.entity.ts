@@ -1,14 +1,14 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Subject } from './subject.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Subject } from './subject.entity'
 
 @Entity()
 export class Teacher {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column()
-  name: string;
+  name: string
 
   @ManyToMany(() => Subject, (subject) => subject.teachers)
-  subjects: Subject[];
+  subjects: Subject[]
 }
