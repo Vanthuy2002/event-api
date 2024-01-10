@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
 import { FindOptionsSelect, Repository } from 'typeorm'
@@ -11,11 +11,16 @@ const inCludeFields = ['name', 'addr', 'id', 'description', 'invitee']
 
 @Injectable()
 export class EventsService {
+  private readonly logger = new Logger(EventsService.name)
   constructor(
-    @InjectRepository(Events) private readonly repo: Repository<Events>,
-    @InjectRepository(Attendee)
-    private readonly attendeRepo: Repository<Attendee>
+    @InjectRepository(Events) private readonly repo: Repository<Events>
+    // @InjectRepository(Attendee)
+    // private readonly attendeRepo: Repository<Attendee>
   ) {}
+
+  private getEventBaseQuery() {
+    return this.repo.createQueryBuilder('e').orderBy('e.id', 'DESC')
+  }
 
   async findAll() {
     const events = await this.repo.find({
@@ -27,18 +32,10 @@ export class EventsService {
     }
   }
 
-  async findById(id: number) {
-    const event = await this.repo.findOne({
-      where: { id },
-      select: inCludeFields as FindOptionsSelect<Events>
-    })
-    if (!event) {
-      throw new NotFoundException(messageResponse.NOT_FOUND__EVENT)
-    }
-    return {
-      message: messageResponse.GET_ONE_EVENT,
-      event
-    }
+  async findById(id: number): Promise<Events> {
+    const query = this.getEventBaseQuery().andWhere('e.id = :id', { id })
+    this.logger.debug(query.getSql())
+    return await query.getOne()
   }
 
   async create(body: CreateEventDTO) {
