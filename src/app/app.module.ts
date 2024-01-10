@@ -7,6 +7,7 @@ import { AppJapanService } from './app.japanese'
 import { AppDummy } from './app.dummy'
 import { ConfigModule } from '@nestjs/config'
 import ormConfig from 'src/config/orm.config'
+import { SchoolModule } from 'src/school/school.module'
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import ormConfig from 'src/config/orm.config'
     TypeOrmModule.forRootAsync({
       useFactory: ormConfig
     }),
-    EventsModule
+    EventsModule,
+    SchoolModule
   ],
 
   controllers: [AppController],
