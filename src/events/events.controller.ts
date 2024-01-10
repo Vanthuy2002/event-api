@@ -8,8 +8,8 @@ import {
   Patch,
   Post
 } from '@nestjs/common'
-import { CreateEvent } from './dto/create-event.dto'
-import { UpdateEvents } from './dto/update-event.dto'
+import { CreateEventDTO } from './dto/create-event.dto'
+import { UpdateEventsDTO } from './dto/update-event.dto'
 import { EventsService } from './events.service'
 
 @Controller('events')
@@ -26,15 +26,15 @@ export class EventsController {
   }
 
   // only work when off global validate
-  // @Body(new ValidationPipe({ groups: ['create'] })) body: CreateEvents
-  // @Body(new ValidationPipe({ groups: ['update'] })) body: UpdateEvents
+  // @Body(new ValidationPipe({ groups: ['create'] })) body: CreateEventDTOs
+  // @Body(new ValidationPipe({ groups: ['update'] })) body: UpdateEventsDTO
   @Post('/create')
-  createNew(@Body() body: CreateEvent) {
+  createNew(@Body() body: CreateEventDTO) {
     return this.eventService.create(body)
   }
 
   @Patch(':id')
-  updateOne(@Param('id') id: string, @Body() body: UpdateEvents) {
+  updateOne(@Param('id') id: string, @Body() body: UpdateEventsDTO) {
     return this.eventService.update(+id, body)
   }
 

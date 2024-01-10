@@ -1,6 +1,6 @@
 import { IsDateString, IsString, Length } from 'class-validator'
 
-export class CreateEvent {
+export class CreateEventDTO {
   @Length(5, 255)
   @IsString()
   name: string

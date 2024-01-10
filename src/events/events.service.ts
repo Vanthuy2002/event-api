@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
 import { Repository } from 'typeorm'
-import { UpdateEvents } from './dto/update-event.dto'
-import { CreateEvent } from './dto/create-event.dto'
+import { UpdateEventsDTO } from './dto/update-event.dto'
+import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
 
 @Injectable()
@@ -28,7 +28,7 @@ export class EventsService {
     }
   }
 
-  async create(body: CreateEvent) {
+  async create(body: CreateEventDTO) {
     const newEvent = await this.repo.save(body)
     return {
       message: messageResponse.CREATED_EVENT,
@@ -36,7 +36,7 @@ export class EventsService {
     }
   }
 
-  async update(id: number, body: UpdateEvents) {
+  async update(id: number, body: UpdateEventsDTO) {
     await this.repo.update(id, { ...body })
     return {
       message: messageResponse.UPDATED_EVENT
