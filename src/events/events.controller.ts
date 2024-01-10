@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -14,9 +15,11 @@ import { EventsService } from './events.service'
 
 @Controller('events')
 export class EventsController {
+  private readonly logger = new Logger(EventsController.name)
   constructor(private readonly eventService: EventsService) {}
   @Get()
   findAll() {
+    this.logger.log(`Hit sent a request`)
     return this.eventService.findAll()
   }
 

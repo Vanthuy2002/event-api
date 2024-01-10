@@ -3,5 +3,6 @@ export const messageResponse = {
   UPDATED_EVENT: 'UPDATED event sucessfull!!',
   GET_ONE_EVENT: 'GET detail successfull',
   GET_ALL_EVENT: 'GET all events successfull',
-  REMOVE_EVENT: 'DELETE event successfull'
+  REMOVE_EVENT: 'DELETE event successfull',
+  NOT_FOUND__EVENT: 'NOT FOUND event'
 } as const
