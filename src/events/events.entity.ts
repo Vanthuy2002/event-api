@@ -25,7 +25,7 @@ export class Events {
   @Column('date')
   when: Date
 
-  @OneToMany(() => Attendee, (invite) => invite.event)
+  @OneToMany(() => Attendee, (invite) => invite.event, { cascade: true })
   invitee: Attendee[]
 
   @CreateDateColumn()

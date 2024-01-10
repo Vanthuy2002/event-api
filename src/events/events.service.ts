@@ -5,13 +5,16 @@ import { FindOptionsSelect, Repository } from 'typeorm'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
+import { Attendee } from './attendee.entity'
 
 const inCludeFields = ['name', 'addr', 'id', 'description', 'invitee']
 
 @Injectable()
 export class EventsService {
   constructor(
-    @InjectRepository(Events) private readonly repo: Repository<Events>
+    @InjectRepository(Events) private readonly repo: Repository<Events>,
+    @InjectRepository(Attendee)
+    private readonly attendeRepo: Repository<Attendee>
   ) {}
 
   async findAll() {
@@ -60,24 +63,17 @@ export class EventsService {
     }
   }
 
-  async getPrative(id: string) {
-    const ids = Number(id)
+  async getPrative() {
     const event = await this.repo.findOne({
-      where: { id: ids },
-      relations: ['invitee'],
-      select: {
-        // Chọn trường cho bảng Event
-        id: true,
-        name: true,
-        description: true,
-        addr: true,
-        // Chọn trường cho bảng Invitee
-        invitee: {
-          id: true,
-          name: true
-        }
-      }
+      where: { id: 1 },
+      relations: ['invitee']
     })
+
+    const attendee = new Attendee()
+    attendee.name = 'Using Cascade'
+    event.invitee.push(attendee)
+    await this.repo.save(event)
+
     return event
   }
 }

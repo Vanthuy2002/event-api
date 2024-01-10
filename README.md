@@ -99,3 +99,40 @@ export class AppJapanService {
 - Create a fake class `AppDummy`, make sure this is a standard service class, but without dependency injection, assign it to providers, then assign it to the `inject` field with provide as `MESSAGE`
 - `useFactory` get a parameter , this params is return all method in `AppDummy`, and you can see at this example
 - Make sure `@Inject` in `AppJapanServices` to use method, variable `message` will be has value retutn by method `dummy()` in `AppDummy` class
+
+## Working with RelationShip in TypeORM
+
+### OneToMany
+
+```ts
+  async getPrative() {
+    const event = await this.repo.findOne({
+      where: { id: 1 },
+      relations: ['invitee']
+    })
+
+    const attendee = new Attendee()
+    attendee.name = 'Using Cascade'
+    event.invitee.push(attendee)
+    await this.repo.save(event)
+
+    return event
+  }
+```
+
+- First, get the event has `id = 1`, and we wil get all data of relationship between 2 table is `events` and `attendee`. With forgein keys is `invitee` fields. And then, we will create an instances of `Attendee` , give it some value, push it in `invitee` array, finally to save it `event`. And don't forget set `cascade` in `EventEntity` , fields `@OneToMany(.., {cascade: true})`
+
+- Way two, simply , create new instances `Attendee`, find `event` want to assign to `attendee` instances, give it some value, and call `attendeeRepo` to save it, like this:
+
+```ts
+async getPrative() {
+  const event = await this.repo.findOneBy({id : 1})
+
+  const attendee = new Attendee()
+  attendee.name = 'Using Cascade'
+  attendee.event = event
+
+  await this.attendeRepo.save(attendee)
+  return event
+  }
+```

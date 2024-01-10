@@ -24,8 +24,8 @@ export class EventsController {
   }
 
   @Get('practive')
-  async findWithRelation(@Body() body: any) {
-    return this.eventService.getPrative(body.id)
+  async findWithRelation() {
+    return this.eventService.getPrative()
   }
 
   @Get(':id')
