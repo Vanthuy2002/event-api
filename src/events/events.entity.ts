@@ -8,6 +8,12 @@ import {
 } from 'typeorm'
 import { Attendee } from './attendee.entity'
 
+export enum AttendeeAnwsers {
+  Agreed = 'agree',
+  Refused = 'refused',
+  Pending = 'pending'
+}
+
 @Entity()
 export class Events {
   @PrimaryGeneratedColumn()
@@ -27,6 +33,19 @@ export class Events {
 
   @OneToMany(() => Attendee, (invite) => invite.event, { cascade: true })
   invitee: Attendee[]
+
+  inviteeCount?: number
+
+  @Column({
+    type: 'enum',
+    enum: AttendeeAnwsers,
+    default: AttendeeAnwsers.Pending
+  })
+  answers: AttendeeAnwsers
+
+  inviteeAgree?: number
+  inviteeRefuse?: number
+  inviteePending?: number
 
   @CreateDateColumn()
   createdAt?: Date

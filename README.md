@@ -136,3 +136,77 @@ async getPrative() {
   return event
   }
 ```
+
+### Many to Many
+
+- updating....
+
+## Query Builder
+
+### Introduction
+
+```ts
+// defined a method (SQL is Query CMD)
+private getEventBaseQuery() {
+    return this.repo.
+    createQueryBuilder('e').
+    orderBy('e.id', 'DESC')
+}
+
+// using
+async findById(id: number): Promise<Events> {
+    const query = this.getEventBaseQuery().andWhere('e.id = :id', { id })
+    this.logger.debug(query.getSql())
+    const event = await query.getOne()
+    return event
+}
+```
+
+- First, defined a query method to use for query, This method is built on `queryBuilder`, used to execute queries, and it is reusable in many places. Returns a method that enters an `e` parameter, representing the `collection name`, using the orderBy method to sort them
+
+- To using and find a record, we proceed to call the method just initialized, call the method `andWhere` to receive the `parameter` as the `condition to find`, this is condition `WHERE` in `SQL`,then call the `getOne() `function to retrieve the most matching record. `this.logger.debug(query.getSql())` this function to log the S`QL comand in console`
+
+### Using queryBuilder with RelationShip
+
+```ts
+// definde method
+getEventsWithAttendeeCount() {
+  return this.getEventBaseQuery().
+    loadRelationCountAndMap(
+      'e.inviteeCount',
+      'e.invitee'
+    )
+  }
+
+// using
+async findById(id: number): Promise<Events> {
+  const query = this.getEventsWithAttendeeCount().
+  andWhere('e.id = :id', { id })
+  const event = await query.getOne()
+  return event
+}
+```
+
+- First, we define a method to use call this is `getEventAndCountAttendee`, using `getEventBaseQuery` we defined last, call method `loadRelationCountAndMap`, this method enter `two parameters` or `four`, 1 is the column where we will `render the total number of invitee`, 2 is the` Forgein key column`, or the `column has a relationship`
+- And we must update `EventEntity`, like this :
+
+```ts
+ @OneToMany(() => Attendee,
+ (invite) => invite.event, { cascade: true })
+  invitee: Attendee[]
+
+  inviteeCount?: number
+```
+
+- We add a new field in `EventEntity`, make sure not add `@Column` in this field, it acts as a `virtual column` to give temporary data in the query. Output query like this :
+
+```json
+{
+  "id": 1,
+  "name": "Team Meetup",
+  "description": "Let's meet together.",
+  "addr": "Office St 120",
+  "when": "2021-02-15",
+  "inviteeCount": 6
+}
+```

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Events } from './events.entity'
+import { AttendeeAnwsers, Events } from './events.entity'
 import { FindOptionsSelect, Repository } from 'typeorm'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { CreateEventDTO } from './dto/create-event.dto'
@@ -14,12 +14,17 @@ export class EventsService {
   private readonly logger = new Logger(EventsService.name)
   constructor(
     @InjectRepository(Events) private readonly repo: Repository<Events>
-    // @InjectRepository(Attendee)
-    // private readonly attendeRepo: Repository<Attendee>
   ) {}
 
   private getEventBaseQuery() {
     return this.repo.createQueryBuilder('e').orderBy('e.id', 'DESC')
+  }
+
+  getEventsWithAttendeeCount() {
+    return this.getEventBaseQuery().loadRelationCountAndMap(
+      'e.inviteeCount',
+      'e.invitee'
+    ) // cout invitee
   }
 
   async findAll() {
@@ -33,7 +38,9 @@ export class EventsService {
   }
 
   async findById(id: number): Promise<Events> {
-    const query = this.getEventBaseQuery().andWhere('e.id = :id', { id })
+    const query = this.getEventsWithAttendeeCount().andWhere('e.id = :id', {
+      id
+    })
     this.logger.debug(query.getSql())
     return await query.getOne()
   }
