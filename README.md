@@ -210,3 +210,38 @@ async findById(id: number): Promise<Events> {
   "inviteeCount": 6
 }
 ```
+
+### More example with queryBuilder
+
+```ts
+getEventsWithAttendeeCount() {
+  return this.getEventBaseQuery()
+    .loadRelationCountAndMap(
+      'e.inviteeCount', 'e.invitee'
+    ) // count all invitee
+    .loadRelationCountAndMap(
+      'e.inviteeAgree', // virtual colum
+      'e.invitee', // foreign key column
+      'inviteeRes', // alias name
+      (qb) =>
+        qb.where('inviteeRes.answers = :answers', {
+          answers: AttendeeAnwsers.Agreed
+        })
+      )} // count invitee agreed
+```
+
+- We can combine multiple queries in the same `queryBuilder` command . As in the example above, we've found the `total number of guests` and the total number of guests who have `agreed to participate`. This query uses `4 parameters` in the `loadRelationCountAndMap` function, `1 and 2 like the example above`, the `3rd parameter is the alias name` of that table, parameter 4 is the `function to query by condition`
+
+- Wil be return like this:
+
+```json
+{
+  "id": 2,
+  "name": "Workshop",
+  "description": "Let's learn something.",
+  "addr": "Workshop St 80",
+  "when": "2021-02-17",
+  "inviteeCount": 3,
+  "inviteeAgree": 1
+}
+```

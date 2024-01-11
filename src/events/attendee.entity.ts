@@ -9,6 +9,11 @@ import {
 } from 'typeorm'
 import { Events } from './events.entity'
 
+export enum AttendeeAnwsers {
+  Agreed = 'agree',
+  Refused = 'refused',
+  Pending = 'pending'
+}
 @Entity()
 export class Attendee {
   @PrimaryGeneratedColumn()
@@ -22,6 +27,13 @@ export class Attendee {
     name: 'event_id'
   })
   event: Events // Đổi tên property này thành event
+
+  @Column({
+    type: 'enum',
+    enum: AttendeeAnwsers,
+    default: AttendeeAnwsers.Pending
+  })
+  answers: AttendeeAnwsers
 
   @CreateDateColumn()
   createdAt: Date

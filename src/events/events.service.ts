@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { AttendeeAnwsers, Events } from './events.entity'
+import { Events } from './events.entity'
 import { FindOptionsSelect, Repository } from 'typeorm'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
-import { Attendee } from './attendee.entity'
+import { Attendee, AttendeeAnwsers } from './attendee.entity'
 
 const inCludeFields = ['name', 'addr', 'id', 'description', 'invitee']
 
@@ -21,10 +21,26 @@ export class EventsService {
   }
 
   getEventsWithAttendeeCount() {
-    return this.getEventBaseQuery().loadRelationCountAndMap(
-      'e.inviteeCount',
-      'e.invitee'
-    ) // cout invitee
+    return this.getEventBaseQuery()
+      .loadRelationCountAndMap('e.inviteeCount', 'e.invitee') // count all invitee
+      .loadRelationCountAndMap(
+        'e.inviteeAgree', // virtual colum
+        'e.invitee', // foreign key column
+        'inviteeRes', // alias name
+        (qb) =>
+          qb.where('inviteeRes.answers = :answers', {
+            answers: AttendeeAnwsers.Agreed
+          })
+      ) // count invitee agreed
+      .loadRelationCountAndMap(
+        'e.inviteePending',
+        'e.invitee',
+        'inviteeRes',
+        (qb) =>
+          qb.where('inviteeRes.answers = :answers', {
+            answers: AttendeeAnwsers.Pending
+          })
+      )
   }
 
   async findAll() {
@@ -42,7 +58,8 @@ export class EventsService {
       id
     })
     this.logger.debug(query.getSql())
-    return await query.getOne()
+    const event = await query.getOne()
+    return event
   }
 
   async create(body: CreateEventDTO) {
