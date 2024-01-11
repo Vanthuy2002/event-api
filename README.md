@@ -245,3 +245,33 @@ getEventsWithAttendeeCount() {
   "inviteeAgree": 1
 }
 ```
+
+### Filter data using queryBuilde
+
+```ts
+async getEventCountAttendeeFilterd(filter?: ListEvents) {
+  let query = this.getEventsWithAttendeeCount()
+  if (!filter) return await query.getMany()
+
+  if (filter.when === WhenEventFilter.TODAY) {
+    query = query.andWhere(
+      `e.when >= CURDATE() AND e.when <= CURDATE() + INTERVAL 1 DAY`
+    )
+  }
+
+  if (filter.when === WhenEventFilter.TOMORROW) {
+    query = query.andWhere(
+      `e.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE() + INTERVAL 2 DAY`
+    )
+  }
+
+  if (filter.when === WhenEventFilter.THISWEEK) {
+    query = query.andWhere(`YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1)`)
+  }
+
+  if (filter.when === WhenEventFilter.NEXTWEEK) {
+    query = query.andWhere(`YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1) + 1`)
+  }
+  return await query.getMany()
+}
+```

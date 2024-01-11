@@ -1,13 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
-import { FindOptionsSelect, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
 import { Attendee, AttendeeAnwsers } from './attendee.entity'
-
-const inCludeFields = ['name', 'addr', 'id', 'description', 'invitee']
+import { ListEvents, WhenEventFilter } from './input/event.filter'
 
 @Injectable()
 export class EventsService {
@@ -43,10 +42,34 @@ export class EventsService {
       )
   }
 
-  async findAll() {
-    const events = await this.repo.find({
-      select: inCludeFields as FindOptionsSelect<Events>
-    })
+  async getEventCountAttendeeFilterd(filter?: ListEvents) {
+    let query = this.getEventsWithAttendeeCount()
+    if (!filter) return await query.getMany()
+
+    if (filter.when === WhenEventFilter.TODAY) {
+      query = query.andWhere(
+        `e.when >= CURDATE() AND e.when <= CURDATE() + INTERVAL 1 DAY`
+      )
+    }
+
+    if (filter.when === WhenEventFilter.TOMORROW) {
+      query = query.andWhere(
+        `e.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE() + INTERVAL 2 DAY`
+      )
+    }
+
+    if (filter.when === WhenEventFilter.THISWEEK) {
+      query = query.andWhere(`YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1)`)
+    }
+
+    if (filter.when === WhenEventFilter.NEXTWEEK) {
+      query = query.andWhere(`YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1) + 1`)
+    }
+    return await query.getMany()
+  }
+
+  async findAll(filter?: ListEvents) {
+    const events = await this.getEventCountAttendeeFilterd(filter)
     return {
       message: messageResponse.GET_ALL_EVENT,
       events

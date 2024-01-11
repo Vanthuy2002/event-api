@@ -7,20 +7,22 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Post
+  Post,
+  Query
 } from '@nestjs/common'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { EventsService } from './events.service'
+import { ListEvents } from './input/event.filter'
 
 @Controller('events')
 export class EventsController {
   private readonly logger = new Logger(EventsController.name)
   constructor(private readonly eventService: EventsService) {}
   @Get()
-  findAll() {
+  findAll(@Query() filter?: ListEvents) {
     this.logger.log(`Hit sent a request`)
-    return this.eventService.findAll()
+    return this.eventService.findAll(filter)
   }
 
   @Get('practive')
