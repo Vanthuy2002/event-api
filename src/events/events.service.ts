@@ -7,6 +7,7 @@ import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
 import { Attendee, AttendeeAnwsers } from './attendee.entity'
 import { ListEvents, WhenEventFilter } from './input/event.filter'
+import { PaginationOptions, paginateHandler } from './input/pagination'
 
 @Injectable()
 export class EventsService {
@@ -19,7 +20,7 @@ export class EventsService {
     return this.repo.createQueryBuilder('e').orderBy('e.id', 'DESC')
   }
 
-  getEventsWithAttendeeCount() {
+  private getEventsWithAttendeeCount() {
     return this.getEventBaseQuery()
       .loadRelationCountAndMap('e.inviteeCount', 'e.invitee') // count all invitee
       .loadRelationCountAndMap(
@@ -42,9 +43,9 @@ export class EventsService {
       )
   }
 
-  async getEventCountAttendeeFilterd(filter?: ListEvents) {
+  private getEventCountAttendeeFilterd(filter?: ListEvents) {
     let query = this.getEventsWithAttendeeCount()
-    if (!filter) return await query.getMany()
+    if (!filter) return query
 
     if (filter.when === WhenEventFilter.TODAY) {
       query = query.andWhere(
@@ -65,15 +66,19 @@ export class EventsService {
     if (filter.when === WhenEventFilter.NEXTWEEK) {
       query = query.andWhere(`YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1) + 1`)
     }
-    return await query.getMany()
+    return query
   }
 
-  async findAll(filter?: ListEvents) {
-    const events = await this.getEventCountAttendeeFilterd(filter)
-    return {
-      message: messageResponse.GET_ALL_EVENT,
-      events
-    }
+  async getEventPagination(paginate: PaginationOptions, filter: ListEvents) {
+    return await paginateHandler(
+      this.getEventCountAttendeeFilterd(filter),
+      paginate
+    )
+  }
+
+  async findAll(paginate: PaginationOptions, filter?: ListEvents) {
+    const events = await this.getEventPagination(paginate, filter)
+    return events
   }
 
   async findById(id: number): Promise<Events> {

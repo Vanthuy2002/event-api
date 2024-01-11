@@ -14,15 +14,16 @@ import { CreateEventDTO } from './dto/create-event.dto'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { EventsService } from './events.service'
 import { ListEvents } from './input/event.filter'
+import { PaginationOptions } from './input/pagination'
 
 @Controller('events')
 export class EventsController {
   private readonly logger = new Logger(EventsController.name)
   constructor(private readonly eventService: EventsService) {}
   @Get()
-  findAll(@Query() filter?: ListEvents) {
+  findAll(@Query() paginate: PaginationOptions, @Query() filter?: ListEvents) {
     this.logger.log(`Hit sent a request`)
-    return this.eventService.findAll(filter)
+    return this.eventService.findAll(paginate, filter)
   }
 
   @Get('practive')

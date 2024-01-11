@@ -275,3 +275,88 @@ async getEventCountAttendeeFilterd(filter?: ListEvents) {
   return await query.getMany()
 }
 ```
+
+### Pagination with Query Builder
+
+```ts
+import { SelectQueryBuilder } from 'typeorm'
+
+export interface PaginationOptions {
+  page: string
+  limit: string
+}
+
+export interface Pagination<T> {
+  limit: number
+  page: number
+  total: number
+  total_pages: number
+  data: T[]
+}
+
+export async function paginateHandler<T>(
+  handler: SelectQueryBuilder<T>,
+  options: PaginationOptions
+): Promise<Pagination<T>> {
+  const PAGE = parseInt(options.page)
+  const LIMIT = parseInt(options.limit)
+
+  const offset = (PAGE - 1) * LIMIT
+  const [data, count] = await Promise.all([
+    handler.offset(offset).limit(LIMIT).getMany(),
+    handler.getCount()
+  ])
+
+  const total_pages = Math.ceil(count / LIMIT)
+
+  return {
+    data,
+    page: PAGE,
+    limit: LIMIT,
+    total: count,
+    total_pages
+  }
+}
+```
+
+- First , let defined method call `paginate()` to handle this logic pagination. This function takes in `2 parameters`, 1 is another function that `handles` `querying` data under the database, then `pagination`, `limiting` the data that can be returned, the second is options for fractions page, the `first parameter` will rely on the options of the `2nd parameter` to conduct pagination
+
+```ts
+// events.services.ts
+async getEventPagination(
+  paginate: PaginationOptions, filter: ListEvents) {
+    return await paginateHandler(
+      this.getEventCountAttendeeFilterd(filter),
+      paginate
+    )
+}
+
+ async findAll(
+  paginate: PaginationOptions, filter?: ListEvents) {
+  const events = await this.getEventPagination(
+    paginate, filter
+  )
+  return events
+}
+
+// need change some logic in getEventCountAttendeeFilterd()
+ private getEventCountAttendeeFilterd(filter?: ListEvents){
+    let query = this.getEventsWithAttendeeCount()
+    if (!filter) return query
+
+    if(filter.when === ...)
+    return query
+}
+
+// events.controller.ts
+@Get()
+findAll(
+@Query() paginate: PaginationOptions,
+@Query() filter?: ListEvents
+) {
+  this.logger.log(`Hit sent a request`)
+  return this.eventService.findAll(paginate, filter)
+}
+```
+
+- Let see, method `getEventCountAttendeeFilterd()` now just return query: SelectQueryBuilder to run in method `paginate()`
