@@ -5,12 +5,14 @@ import { Repository } from 'typeorm'
 import { User } from './user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { messageResponse } from 'src/utils/message'
+import { AuthServices } from './auth.service'
 
 @Injectable()
 export class LocalStragery extends PassportStrategy(Strategy) {
   constructor(
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>
+    private readonly userRepo: Repository<User>,
+    private readonly authService: AuthServices
   ) {
     super()
   }
@@ -30,7 +32,11 @@ export class LocalStragery extends PassportStrategy(Strategy) {
 
   async validate(username: string, password: string) {
     const user = await this.getUser(username)
-    if (password !== user.password) {
+    const isMatched = await this.authService.comparePassword(
+      password,
+      user.password
+    )
+    if (!isMatched) {
       this.logger.debug(`Password not correct`)
       throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
     }
