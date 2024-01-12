@@ -527,3 +527,47 @@ export class AuthServices {
 ```
 
 - In `AuthServices`, defined a method to create a `token` upon `successful authentication`, using data from `request.user`
+
+### Complete login flow
+
+```ts
+// jwt.stragety.ts
+import { PassportStrategy } from '@nestjs/passport'
+import { ExtractJwt, Strategy } from 'passport-jwt'
+
+@Injectable()
+export class JwtStragety extends PassportStrategy(Strategy) {
+  constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>
+  ) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.TOKEN_SECRET
+    })
+  }
+
+  async validate(payload: any): Promise<User> {
+    const user = await this.userRepo.findOne({
+      where: { id: payload.sub },
+      select: { username: true, email: true }
+    })
+    return user
+  }
+}
+```
+
+- After `successfully logging` in and `returning the token`, we create a `jwt.strategy.ts` file so that every time we `send a request to the server`, we will attach that `token to the header` for testing, to check if there is `permission` to `access` that `resource`
+
+- Create a function to get `information` about the `user` who `just logged` in with the `newly created token`. Return `user` will be use by `request.user`
+
+```ts
+// auth.controller.ts
+@Get('whoami')
+  @UseGuards(AuthGuard('jwt'))
+  async whoAmI(@Request() request) {
+    return request.user
+  }
+```
+
+- As in the `previous example`, `@AuthGuards` takes a `name`, we `can define` it in jwt.strategy.ts, otherwise the default is `jwt`. After `successful authentication`, we can get user `information` via `request.user`
