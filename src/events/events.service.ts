@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
-import { Repository } from 'typeorm'
+import { DeleteResult, Repository } from 'typeorm'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { messageResponse } from 'src/utils/message'
@@ -105,11 +105,17 @@ export class EventsService {
     }
   }
 
-  async remove(id: number) {
-    await this.repo.delete(id)
-    return {
-      message: messageResponse.REMOVE_EVENT
-    }
+  async remove(id: number): Promise<DeleteResult> {
+    const results = await this.repo
+      .createQueryBuilder('e')
+      .delete()
+      .where('id = :id', { id })
+      .execute()
+
+    if (results.affected === 0)
+      throw new NotFoundException(messageResponse.NOT_FOUND__EVENT)
+
+    return results
   }
 
   async getPrative() {

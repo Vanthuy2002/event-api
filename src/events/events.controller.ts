@@ -51,7 +51,7 @@ export class EventsController {
 
   @Delete(':id')
   // @HttpCode(204) defined http statucs code
-  remove(@Param('id') id: string) {
-    return this.eventService.remove(+id)
+  async remove(@Param('id') id: string) {
+    return await this.eventService.remove(+id)
   }
 }

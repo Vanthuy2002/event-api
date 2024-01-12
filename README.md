@@ -360,3 +360,61 @@ findAll(
 ```
 
 - Let see, method `getEventCountAttendeeFilterd()` now just return query: SelectQueryBuilder to run in method `paginate()`
+
+### Update, Remove, Insert Relation with QueryBuilder
+
+```ts
+// remove
+async remove(id: number): Promise<DeleteResult> {
+  const results = await this.repo
+    .createQueryBuilder('e')
+    .delete()
+    .where('id = :id', { id })
+    .execute()
+
+  if (results.affected === 0)
+    throw new NotFoundException(
+  messageResponse.NOT_FOUND__EVENT
+  )
+  return results
+}
+```
+
+- Create a method `createQueryBuilder()`, call method `delete()`, find with cond `where()` and `execute()` it. Call `execute()`, will be return `DeleteResult`, based on that, we can know the `number of affected columns`, whether to delete the original intent or not
+
+```ts
+// update
+public async removingRelation() {
+  return await this.subjectRepository
+    .createQueryBuilder('s')
+    .update()
+    .set({ name: 'Confidential' })
+    .execute()
+}
+```
+
+- We create the method as above, replace `delete()` with `update()`, call the set method to `update the data`, then call `execute()` to check the effect.
+
+```ts
+// insert will relation
+// we createQueryBuilder to assign ONE `subject` to TWO `teachers
+
+// one subject can have alot of teachers
+// one teacher can teach many subject
+
+public async savingRelation() {
+  // get subject, teachers
+  const [subject, teacher1, teacher2] = await Promise.all([
+    this.subjectRepository.findOne({ where: { id: 5 } }),
+    this.teacherRepository.findOne({ where: { id: 1 } }),
+    this.teacherRepository.findOne({ where: { id: 2 } })
+  ])
+  return await this.subjectRepository
+    .createQueryBuilder()
+    .relation(Subject, 'teachers') //name Entity and tables relations
+    .of(subject) // refrence to data Entity
+    .add([teacher1, teacher2]) // add data
+}
+```
+
+- Find `subject` and `teachers` want to `insert` or `update` . Create `queryBuilders()`, then call `realtion()`, accepts `two parameters`, 1 is the ` Entity` `target` you want to insert, 2 is the relational data table. Ưith this example, we insert one `subject` to two `teachers`, so the `Entity` target now is `Subject`. Calling the `of()` function takes as parameter `the data of the target entity` to be inserted. And finally, call method `add()` to insert data
