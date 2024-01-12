@@ -374,7 +374,7 @@ async remove(id: number): Promise<DeleteResult> {
 
   if (results.affected === 0)
     throw new NotFoundException(
-  messageResponse.NOT_FOUND__EVENT
+  messageResponse.NOT_FOUND_EVENT
   )
   return results
 }

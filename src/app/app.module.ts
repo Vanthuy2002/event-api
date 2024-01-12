@@ -8,6 +8,7 @@ import { AppDummy } from './app.dummy'
 import { ConfigModule } from '@nestjs/config'
 import ormConfig from 'src/config/orm.config'
 import { SchoolModule } from 'src/school/school.module'
+import { AuthModule } from 'src/auth/auth.module'
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { SchoolModule } from 'src/school/school.module'
       useFactory: ormConfig
     }),
     EventsModule,
-    SchoolModule
+    SchoolModule,
+    AuthModule
   ],
 
   controllers: [AppController],
