@@ -9,9 +9,11 @@ import { AuthServices } from './auth.service'
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    JwtModule.register({
-      signOptions: { expiresIn: process.env.TOKEN_EXPIRED },
-      secret: process.env.TOKEN_SECRET
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        signOptions: { expiresIn: process.env.TOKEN_EXPIRED },
+        secret: process.env.TOKEN_SECRET
+      })
     })
   ],
   controllers: [AuthController],

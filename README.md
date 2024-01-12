@@ -418,3 +418,112 @@ public async savingRelation() {
 ```
 
 - Find `subject` and `teachers` want to `insert` or `update` . Create `queryBuilders()`, then call `realtion()`, accepts `two parameters`, 1 is the ` Entity` `target` you want to insert, 2 is the relational data table. Ưith this example, we insert one `subject` to two `teachers`, so the `Entity` target now is `Subject`. Calling the `of()` function takes as parameter `the data of the target entity` to be inserted. And finally, call method `add()` to insert data
+
+## Authentication with JWT, Passport
+
+### PART ONE
+
+- First, we need some package to handle this logic : `@nestjs/jwt`, `passport`, `passport-jwt`, `passport-local`, `@nestjs/passport` and don't forget to install @types/... for them
+
+- Setup to use :
+
+```ts
+// auth.module.ts
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        signOptions: { expiresIn: process.env.TOKEN_EXPIRED },
+        secret: process.env.TOKEN_SECRET
+      })
+    })
+  ],
+  controllers: [AuthController],
+  providers: [LocalStragery, AuthServices]
+})
+```
+
+- Import `JwtModule` , register at module, use `registerAsync()`, `secret` or `sighOptions`, every time you create a `token`, the above options will be `used by default`, because they are `globally registered`, of course, this is just `for learning`, when reality will be different.
+
+```ts
+import { PassportStrategy } from '@nestjs/passport'
+import { Strategy } from 'passport-local'
+
+@Injectable()
+export class LocalStragery extends PassportStrategy(Strategy) {
+  constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>
+  ) {
+    super()
+  }
+  private readonly logger = new Logger(LocalStragery.name)
+
+  private async getUser(username: string) {
+    const user = await this.userRepo.findOne({
+      where: { username },
+      select: { username: true, password: true, id: true }
+    })
+    if (!user) {
+      this.logger.debug(`User ${username} not found!`)
+      throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
+    }
+    return user
+  }
+
+  async validate(username: string, password: string) {
+    const user = await this.getUser(username)
+    if (password !== user.password) {
+      this.logger.debug(`Password not correct`)
+      throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
+    }
+    return user
+  }
+}
+```
+
+- Create a class `LocalStragery`, it acts as middleware, handling data transmission. There are `2 main tasks`: check the input data, based on that to `find the user` in the database, 2 is to `perform authentication` when the user has been found. If valid, returns `user`. This `user` will be `assigned` to the request for `processing` in the `AuthController`
+
+```ts
+// auth.controller.ts
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthServices) {}
+
+  @Post('/login')
+  @UseGuards(AuthGuard('local'))
+  async login(@Request() request) {
+    return {
+      token: this.authService.generateToken(request.user)
+    }
+  }
+}
+```
+
+- In `AuthController`, we see a decorator is `AuthGuard('local')`. This decorator, `as per my understanding`, I think it will `trigger` methods in `LocalStragery`, with name as input argument, we can define name in `LocalStragery` class. like this :
+
+```ts
+export class LocalStragery extends PassportStrategy(Strategy, 'something') {}
+```
+
+If not named, it will default to `local`
+
+```ts
+ async login(@Request() request) {}
+```
+
+- The login function receives a parameter called `request`. If the user has been `authenticated successfully`, `request.user` can be used
+
+```ts
+@Injectable()
+export class AuthServices {
+  constructor(private readonly jwtService: JwtService) {}
+
+  generateToken(user: User) {
+    const payload = { sub: user.id }
+    return this.jwtService.sign(payload)
+  }
+}
+```
+
+- In `AuthServices`, defined a method to create a `token` upon `successful authentication`, using data from `request.user`
