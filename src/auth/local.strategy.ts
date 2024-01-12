@@ -16,20 +16,20 @@ export class LocalStragery extends PassportStrategy(Strategy) {
   }
   private readonly logger = new Logger(LocalStragery.name)
 
-  private async getUser(fullname: string) {
+  private async getUser(username: string) {
     const user = await this.userRepo.findOne({
-      where: { fullname },
-      select: { fullname: true, password: true }
+      where: { username },
+      select: { username: true, password: true, id: true }
     })
     if (!user) {
-      this.logger.debug(`User ${fullname} not found!`)
+      this.logger.debug(`User ${username} not found!`)
       throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
     }
     return user
   }
 
-  async validate(fullname: string, password: string) {
-    const user = await this.getUser(fullname)
+  async validate(username: string, password: string) {
+    const user = await this.getUser(username)
     if (password !== user.password) {
       this.logger.debug(`Password not correct`)
       throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
