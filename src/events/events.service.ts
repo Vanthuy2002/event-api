@@ -8,6 +8,7 @@ import { messageResponse } from 'src/utils/message'
 import { Attendee, AttendeeAnwsers } from './attendee.entity'
 import { ListEvents, WhenEventFilter } from './input/event.filter'
 import { PaginationOptions, paginateHandler } from './input/pagination'
+import { User } from 'src/auth/user.entity'
 
 @Injectable()
 export class EventsService {
@@ -90,12 +91,11 @@ export class EventsService {
     return event
   }
 
-  async create(body: CreateEventDTO) {
-    const newEvent = await this.repo.save(body)
-    return {
-      message: messageResponse.CREATED_EVENT,
-      event: newEvent
-    }
+  async create(body: CreateEventDTO, user: User) {
+    return await this.repo.save({
+      ...body,
+      organizer: user
+    })
   }
 
   async update(id: number, body: UpdateEventsDTO) {

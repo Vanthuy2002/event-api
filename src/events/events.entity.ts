@@ -2,11 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { Attendee } from './attendee.entity'
+import { User } from 'src/auth/user.entity'
 
 @Entity()
 export class Events {
@@ -28,8 +31,14 @@ export class Events {
   @OneToMany(() => Attendee, (invite) => invite.event, { cascade: true })
   invitee: Attendee[]
 
-  inviteeCount?: number
+  @ManyToOne(() => User, (user) => user.organized)
+  @JoinColumn({ name: 'organizer_id' })
+  organizer: User
 
+  @Column({ nullable: true })
+  organizer_id: number
+
+  inviteeCount?: number
   inviteeAgree?: number
   inviteeRefuse?: number
   inviteePending?: number

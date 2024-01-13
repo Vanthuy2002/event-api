@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { Profile } from './profile.entity'
+import { Events } from 'src/events/events.entity'
 
 @Entity()
 export class User {
@@ -26,6 +28,9 @@ export class User {
   @OneToOne(() => Profile)
   @JoinColumn()
   profile: Profile
+
+  @OneToMany(() => Events, (event) => event.organizer)
+  organized: Events[]
 
   @CreateDateColumn()
   createdAt: Date

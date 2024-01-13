@@ -8,13 +8,17 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query
+  Query,
+  UseGuards
 } from '@nestjs/common'
 import { CreateEventDTO } from './dto/create-event.dto'
 import { UpdateEventsDTO } from './dto/update-event.dto'
 import { EventsService } from './events.service'
 import { ListEvents } from './input/event.filter'
 import { PaginationOptions } from './input/pagination'
+import { CurrentUser } from 'src/auth/user.decorator'
+import { User } from 'src/auth/user.entity'
+import { AuthGuardJwt } from 'src/auth/input/authGuard'
 
 @Controller('events')
 export class EventsController {
@@ -40,8 +44,9 @@ export class EventsController {
   // @Body(new ValidationPipe({ groups: ['create'] })) body: CreateEventDTOs
   // @Body(new ValidationPipe({ groups: ['update'] })) body: UpdateEventsDTO
   @Post('/create')
-  createNew(@Body() body: CreateEventDTO) {
-    return this.eventService.create(body)
+  @UseGuards(AuthGuardJwt)
+  createNew(@Body() body: CreateEventDTO, @CurrentUser() user: User) {
+    return this.eventService.create(body, user)
   }
 
   @Patch(':id')
