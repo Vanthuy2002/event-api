@@ -571,3 +571,40 @@ export class JwtStragety extends PassportStrategy(Strategy) {
 ```
 
 - As in the `previous example`, `@AuthGuards` takes a `name`, we `can define` it in jwt.strategy.ts, otherwise the default is `jwt`. After `successful authentication`, we can get user `information` via `request.user`
+
+### Custom @CurrentUser
+
+```ts
+import { ExecutionContext, createParamDecorator } from '@nestjs/common'
+
+export const CurrentUser = createParamDecorator(
+  (data: any, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest()
+    return request.user ?? {}
+  }
+)
+```
+
+- This `@CurrentUser` will `intercept` the request after `authentication` and `return user` to us. Now our `Controllers` like this :
+
+```ts
+export class AuthController {
+  constructor(private readonly authService: AuthServices) {}
+
+  @Post('login')
+  @UseGuards(AuthGuard('local'))
+  async login(@CurrentUser() user: User) {
+    return {
+      token: this.authService.generateToken(user)
+    }
+  }
+
+  @Get('whoami')
+  @UseGuards(AuthGuard('jwt'))
+  async whoAmI(@CurrentUser() user: User) {
+    return user
+  }
+}
+```
+
+- Pass all the `authentication steps`, save the user in the request, then `retrieve` it via our `@CurrentUser`
