@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
 import { DeleteResult, Repository } from 'typeorm'
@@ -98,14 +103,23 @@ export class EventsService {
     })
   }
 
-  async update(id: number, body: UpdateEventsDTO) {
+  async update(id: number, body: UpdateEventsDTO, user: User) {
+    const event = await this.repo.findOneBy({ id })
+    if (event.organizer_id !== user.id) {
+      throw new ForbiddenException(null, messageResponse.PERMISSION)
+    }
     await this.repo.update(id, { ...body })
     return {
       message: messageResponse.UPDATED_EVENT
     }
   }
 
-  async remove(id: number): Promise<DeleteResult> {
+  async remove(id: number, user: User): Promise<DeleteResult> {
+    const event = await this.repo.findOneBy({ id })
+    if (event.organizer_id !== user.id) {
+      throw new ForbiddenException(null, messageResponse.PERMISSION)
+    }
+
     const results = await this.repo
       .createQueryBuilder('e')
       .delete()

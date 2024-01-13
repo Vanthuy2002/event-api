@@ -50,13 +50,22 @@ export class EventsController {
   }
 
   @Patch(':id')
-  updateOne(@Param('id') id: string, @Body() body: UpdateEventsDTO) {
-    return this.eventService.update(+id, body)
+  @UseGuards(AuthGuardJwt)
+  updateOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateEventsDTO,
+    @CurrentUser() user: User
+  ) {
+    return this.eventService.update(id, body, user)
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuardJwt)
   // @HttpCode(204) defined http statucs code
-  async remove(@Param('id') id: string) {
-    return await this.eventService.remove(+id)
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User
+  ) {
+    return await this.eventService.remove(id, user)
   }
 }

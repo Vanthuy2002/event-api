@@ -8,5 +8,6 @@ export const messageResponse = {
   NOT_FOUND_USER: 'Name or password not correct',
   NOT_MATCHED: "Password doesn't matched",
   ALREADY_USE: 'Username or email has adready to use',
-  REGISTER: 'Register user successfull!!'
+  REGISTER: 'Register user successfull!!',
+  PERMISSION: 'Permission denined'
 } as const
