@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { AuthServices } from './auth.service'
-import { User } from './user.entity'
+import { User } from './entity'
 import { messageResponse } from 'src/utils/message'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'

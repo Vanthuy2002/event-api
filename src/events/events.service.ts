@@ -13,7 +13,7 @@ import { messageResponse } from 'src/utils/message'
 import { Attendee, AttendeeAnwsers } from './attendee.entity'
 import { ListEvents, WhenEventFilter } from './input/event.filter'
 import { PaginationOptions, paginateHandler } from './input/pagination'
-import { User } from 'src/auth/user.entity'
+import { User } from 'src/auth/entity/user.entity'
 
 @Injectable()
 export class EventsService {

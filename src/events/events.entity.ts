@@ -9,7 +9,7 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import { Attendee } from './attendee.entity'
-import { User } from 'src/auth/user.entity'
+import { User } from 'src/auth/entity/user.entity'
 
 @Entity()
 export class Events {

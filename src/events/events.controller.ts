@@ -16,8 +16,8 @@ import { UpdateEventsDTO } from './dto/update-event.dto'
 import { EventsService } from './events.service'
 import { ListEvents } from './input/event.filter'
 import { PaginationOptions } from './input/pagination'
-import { CurrentUser } from 'src/auth/user.decorator'
-import { User } from 'src/auth/user.entity'
+import { CurrentUser } from 'src/auth/decorator/user.decorator'
+import { User } from 'src/auth/entity/user.entity'
 import { AuthGuardJwt } from 'src/auth/input/authGuard'
 
 @Controller('events')
