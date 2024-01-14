@@ -18,7 +18,7 @@ import { ListEvents } from './input/event.filter'
 import { PaginationOptions } from './input/pagination'
 import { CurrentUser } from 'src/auth/decorator/user.decorator'
 import { User } from 'src/auth/entity/user.entity'
-import { AuthGuardJwt } from 'src/auth/input/authGuard'
+import { AuthGuardJwt } from 'src/auth/guards/authGuard'
 
 @Controller('events')
 export class EventsController {
