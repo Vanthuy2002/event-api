@@ -25,7 +25,7 @@ export class LocalStragery extends PassportStrategy(Strategy) {
     })
     if (!user) {
       this.logger.debug(`User ${username} not found!`)
-      throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
+      throw new UnauthorizedException(messageResponse.NOT_CORRECT)
     }
     return user
   }
@@ -38,7 +38,7 @@ export class LocalStragery extends PassportStrategy(Strategy) {
     )
     if (!isMatched) {
       this.logger.debug(`Password not correct`)
-      throw new UnauthorizedException(messageResponse.NOT_FOUND_USER)
+      throw new UnauthorizedException(messageResponse.NOT_CORRECT)
     }
 
     return user

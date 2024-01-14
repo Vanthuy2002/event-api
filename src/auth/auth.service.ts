@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { User } from './user.entity'
 import * as bcrypt from 'bcrypt'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { messageResponse } from 'src/utils/message'
 
 @Injectable()
 export class AuthServices {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly jwtService: JwtService
+  ) {}
 
-  generateToken(user: User) {
+  async generateToken(
+    user: User,
+    expiresIn = process.env.TOKEN_EXPIRED
+  ): Promise<string> {
     const payload = { sub: user.id }
-    return this.jwtService.sign(payload)
+    return await this.jwtService.signAsync(payload, { expiresIn })
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -21,5 +30,12 @@ export class AuthServices {
   async comparePassword(password: string, hashPass: string): Promise<boolean> {
     const isMatched = await bcrypt.compare(password, hashPass)
     return isMatched
+  }
+
+  async saveRefreshToken(userId: number, refresh_token: string) {
+    const result = await this.userRepo.update({ id: userId }, { refresh_token })
+    if (result.affected === 0) {
+      throw new NotFoundException(messageResponse.NOT_FOUND_USER)
+    }
   }
 }

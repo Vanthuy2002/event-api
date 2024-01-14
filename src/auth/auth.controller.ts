@@ -11,8 +11,14 @@ export class AuthController {
   @Post('login')
   @UseGuards(AuthGuardLocal)
   async login(@CurrentUser() user: User) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.authService.generateToken(user),
+      this.authService.generateToken(user, process.env.TOKEN_REFRESH_EXPIRED)
+    ])
+    await this.authService.saveRefreshToken(user.id, refresh_token)
     return {
-      token: this.authService.generateToken(user)
+      access_token,
+      refresh_token
     }
   }
 

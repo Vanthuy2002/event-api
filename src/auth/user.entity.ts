@@ -25,6 +25,9 @@ export class User {
   @Column()
   password: string
 
+  @Column()
+  refresh_token: string
+
   @OneToOne(() => Profile)
   @JoinColumn()
   profile: Profile

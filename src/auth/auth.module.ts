@@ -13,7 +13,6 @@ import { UserController } from './user.controller'
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       useFactory: () => ({
-        signOptions: { expiresIn: process.env.TOKEN_EXPIRED },
         secret: process.env.TOKEN_SECRET
       })
     })
