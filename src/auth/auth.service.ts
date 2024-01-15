@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { User } from './entity'
 import * as bcrypt from 'bcrypt'
@@ -40,5 +44,13 @@ export class AuthServices {
     if (result.affected === 0) {
       throw new NotFoundException(messageResponse.NOT_FOUND_USER)
     }
+  }
+
+  async removeHashToken(id: number) {
+    // remove access_token in client first
+    // remove refresh_token in DB
+    const result = await this.userRepo.update({ id }, { refresh_token: null })
+    if (result.affected === 0)
+      throw new ForbiddenException(null, messageResponse.PERMISSION)
   }
 }

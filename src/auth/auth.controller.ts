@@ -1,8 +1,9 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common'
+import { Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common'
 import { AuthServices } from './auth.service'
 import { CurrentUser } from './decorator'
 import { User } from './entity'
 import { AuthGuardJwt, AuthGuardLocal } from './guards/authGuard'
+import { HttpCodeStatus } from 'src/utils/httpStatus'
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +23,16 @@ export class AuthController {
     }
   }
 
+  @Post('logout')
+  @UseGuards(AuthGuardJwt)
+  @HttpCode(HttpCodeStatus.NOTHING)
+  async logout(@CurrentUser() user: User) {
+    return await this.authService.removeHashToken(user.id)
+  }
+
   @Get('whoami')
   @UseGuards(AuthGuardJwt)
+  @HttpCode(HttpCodeStatus.OK)
   async whoAmI(@CurrentUser() user: User) {
     return user
   }
