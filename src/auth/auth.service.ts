@@ -25,18 +25,18 @@ export class AuthServices {
     return await this.jwtService.signAsync(payload, { expiresIn })
   }
 
-  async hashPassword(password: string): Promise<string> {
-    const hashedString = await bcrypt.hash(password, 2)
-    return hashedString
+  async hashString(password: string): Promise<string> {
+    const hashed = await bcrypt.hash(password, 2)
+    return hashed
   }
 
-  async comparePassword(password: string, hashPass: string): Promise<boolean> {
+  async compareString(password: string, hashPass: string): Promise<boolean> {
     const isMatched = await bcrypt.compare(password, hashPass)
     return isMatched
   }
 
   async saveHashToken(userId: number, refresh_token: string) {
-    const hashRt = await this.hashPassword(refresh_token)
+    const hashRt = await this.hashString(refresh_token)
     const result = await this.userRepo.update(
       { id: userId },
       { refresh_token: hashRt }
@@ -52,5 +52,20 @@ export class AuthServices {
     const result = await this.userRepo.update({ id }, { refresh_token: null })
     if (result.affected === 0)
       throw new ForbiddenException(null, messageResponse.PERMISSION)
+  }
+
+  async handleRefreshToken({ id, token }: { id: number; token: string }) {
+    // find user
+    const user = await this.userRepo.findOne({
+      where: { id },
+      select: { username: true, id: true, refresh_token: true }
+    })
+    // compare token
+    const isMatched = await this.compareString(token, user.refresh_token)
+    if (!isMatched) throw new ForbiddenException(messageResponse.PERMISSION)
+
+    // return new access_token
+    const access_token = await this.generateToken(user)
+    return { access_token }
   }
 }

@@ -4,4 +4,4 @@ export class AuthGuardJwt extends AuthGuard('access_token') {}
 
 export class AuthGuardLocal extends AuthGuard('local') {}
 
-export class AuthGuardRT extends AuthGuard('refresh_token') {}
+export class AuthGuardRT extends AuthGuard('jwt-refresh') {}

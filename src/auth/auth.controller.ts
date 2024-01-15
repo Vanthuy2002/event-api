@@ -1,9 +1,10 @@
-import { Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common'
+import { Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
 import { AuthServices } from './auth.service'
 import { CurrentUser } from './decorator'
 import { User } from './entity'
-import { AuthGuardJwt, AuthGuardLocal } from './guards/authGuard'
+import { AuthGuardJwt, AuthGuardLocal, AuthGuardRT } from './guards/authGuard'
 import { HttpCodeStatus } from 'src/utils/httpStatus'
+import { Request } from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -35,5 +36,16 @@ export class AuthController {
   @HttpCode(HttpCodeStatus.OK)
   async whoAmI(@CurrentUser() user: User) {
     return user
+  }
+
+  @Get('refresh')
+  @UseGuards(AuthGuardRT)
+  @HttpCode(HttpCodeStatus.OK)
+  async refreshToken(@Req() req: Request) {
+    const user = req.user
+    return await this.authService.handleRefreshToken({
+      id: user['sub'],
+      token: user['refresh_token']
+    })
   }
 }

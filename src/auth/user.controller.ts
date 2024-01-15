@@ -26,7 +26,7 @@ export class UserController {
       throw new BadRequestException(messageResponse.ALREADY_USE)
     }
 
-    const hash = await this.authService.hashPassword(body.password)
+    const hash = await this.authService.hashString(body.password)
     const user = new User()
     user.email = body.email
     user.password = hash

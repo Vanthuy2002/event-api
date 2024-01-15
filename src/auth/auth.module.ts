@@ -2,7 +2,7 @@ import { UserController } from './user.controller'
 import { User } from './entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Module } from '@nestjs/common'
-import { JwtStragety, LocalStragery, RTStragety } from './stragety'
+import { JwtStragety, LocalStragery, RefreshTokenStrategy } from './stragety'
 import { JwtModule } from '@nestjs/jwt'
 import { AuthServices } from './auth.service'
 import { AuthController } from './auth.controller'
@@ -17,6 +17,6 @@ import { AuthController } from './auth.controller'
     })
   ],
   controllers: [AuthController, UserController],
-  providers: [LocalStragery, AuthServices, JwtStragety, RTStragety]
+  providers: [LocalStragery, AuthServices, JwtStragety, RefreshTokenStrategy]
 })
 export class AuthModule {}

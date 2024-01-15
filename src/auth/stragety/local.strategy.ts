@@ -32,7 +32,7 @@ export class LocalStragery extends PassportStrategy(Strategy) {
 
   async validate(username: string, password: string) {
     const user = await this.getUser(username)
-    const isMatched = await this.authService.comparePassword(
+    const isMatched = await this.authService.compareString(
       password,
       user.password
     )
