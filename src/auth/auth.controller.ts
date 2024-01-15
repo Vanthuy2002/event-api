@@ -1,10 +1,18 @@
-import { Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UseGuards
+} from '@nestjs/common'
 import { AuthServices } from './auth.service'
 import { CurrentUser } from './decorator'
 import { User } from './entity'
 import { AuthGuardJwt, AuthGuardLocal, AuthGuardRT } from './guards/authGuard'
 import { HttpCodeStatus } from 'src/utils/httpStatus'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -12,23 +20,18 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(AuthGuardLocal)
-  async login(@CurrentUser() user: User) {
-    const [access_token, refresh_token] = await Promise.all([
-      this.authService.generateToken(user),
-      this.authService.generateToken(user, process.env.TOKEN_REFRESH_EXPIRED)
-    ])
-    await this.authService.saveHashToken(user.id, refresh_token)
-    return {
-      access_token,
-      refresh_token
-    }
+  async login(
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return await this.authService.handleLogin(user, res)
   }
 
   @Post('logout')
   @UseGuards(AuthGuardJwt)
   @HttpCode(HttpCodeStatus.NOTHING)
   async logout(@CurrentUser() user: User) {
-    return await this.authService.removeHashToken(user.id)
+    return await this.authService.removeRefreshToken(user.id)
   }
 
   @Get('whoami')
@@ -43,9 +46,11 @@ export class AuthController {
   @HttpCode(HttpCodeStatus.OK)
   async refreshToken(@Req() req: Request) {
     const user = req.user
-    return await this.authService.handleRefreshToken({
-      id: user['sub'],
-      token: user['refresh_token']
-    })
+    console.log(user)
+    return 'get info by cookies'
+    // return await this.authService.handleRefreshToken({
+    //   id: user['sub'],
+    //   token: user['refresh_token']
+    // })
   }
 }
