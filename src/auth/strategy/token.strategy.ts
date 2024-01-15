@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { Request } from 'express'
 import { ExtractJwt, Strategy } from 'passport-jwt'
+import { messageResponse } from 'src/utils/message'
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -22,7 +23,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (req.cookies && req.cookies?.token) {
       return req.cookies?.token
     }
-    return null
+    throw new ForbiddenException(null, messageResponse.PERMISSION)
   }
 
   async validate(payload: any) {

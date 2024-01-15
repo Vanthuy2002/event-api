@@ -27,22 +27,25 @@ export class AuthController {
     return await this.authService.handleLogin(user, res)
   }
 
-  @Post('logout')
-  @UseGuards(AuthGuardJwt)
-  @HttpCode(HttpCodeStatus.NOTHING)
-  async logout(@CurrentUser() user: User) {
-    return await this.authService.removeRefreshToken(user.id)
-  }
-
   @Get('whoami')
-  @UseGuards(AuthGuardJwt)
+  @UseGuards(AuthGuardJwt) // access_token
   @HttpCode(HttpCodeStatus.OK)
   async whoAmI(@CurrentUser() user: User) {
     return user
   }
 
+  @Post('logout')
+  @UseGuards(AuthGuardRT) // refresh_token
+  @HttpCode(HttpCodeStatus.NOTHING)
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = req.user
+    const result = await this.authService.logoutUser(user['sub'])
+    res.clearCookie('token', { httpOnly: true })
+    return result
+  }
+
   @Get('refresh')
-  @UseGuards(AuthGuardRT)
+  @UseGuards(AuthGuardRT) // refresh_token
   @HttpCode(HttpCodeStatus.OK)
   async refreshToken(@Req() req: Request) {
     const user = req.user

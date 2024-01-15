@@ -62,7 +62,7 @@ export class AuthServices {
     }
   }
 
-  async removeRefreshToken(id: number) {
+  async logoutUser(id: number) {
     // remove access_token in client first
     // remove refresh_token in DB
     const result = await this.userRepo.update({ id }, { refresh_token: null })
