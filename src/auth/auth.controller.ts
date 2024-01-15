@@ -46,11 +46,6 @@ export class AuthController {
   @HttpCode(HttpCodeStatus.OK)
   async refreshToken(@Req() req: Request) {
     const user = req.user
-    console.log(user)
-    return 'get info by cookies'
-    // return await this.authService.handleRefreshToken({
-    //   id: user['sub'],
-    //   token: user['refresh_token']
-    // })
+    return await this.authService.handleRefreshToken(user['sub'])
   }
 }

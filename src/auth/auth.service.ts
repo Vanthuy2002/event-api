@@ -45,7 +45,7 @@ export class AuthServices {
     res.cookie('token', refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' ? true : false,
-      sameSite: 'lax',
+      sameSite: 'none',
       expires: new Date(Date.now() + 1 * 24 * 60 * 1000)
     })
 
@@ -70,17 +70,12 @@ export class AuthServices {
       throw new ForbiddenException(null, messageResponse.PERMISSION)
   }
 
-  async handleRefreshToken({ id, token }: { id: number; token: string }) {
-    // find user
+  async handleRefreshToken(id: number) {
     const user = await this.userRepo.findOne({
       where: { id },
-      select: { username: true, id: true, refresh_token: true }
+      select: { id: true, username: true }
     })
-    // compare token
-    const isMatched = await this.compareString(token, user.refresh_token)
-    if (!isMatched) throw new ForbiddenException(messageResponse.PERMISSION)
-
-    // return new access_token
+    if (!user) throw new ForbiddenException(null, messageResponse.PERMISSION)
     const access_token = await this.generateToken(user)
     return { access_token }
   }
