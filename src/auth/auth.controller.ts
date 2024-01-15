@@ -15,7 +15,7 @@ export class AuthController {
       this.authService.generateToken(user),
       this.authService.generateToken(user, process.env.TOKEN_REFRESH_EXPIRED)
     ])
-    await this.authService.saveRefreshToken(user.id, refresh_token)
+    await this.authService.saveHashToken(user.id, refresh_token)
     return {
       access_token,
       refresh_token

@@ -22,8 +22,7 @@ export class AuthServices {
   }
 
   async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(2)
-    const hashedString = await bcrypt.hash(password, salt)
+    const hashedString = await bcrypt.hash(password, 2)
     return hashedString
   }
 
@@ -32,8 +31,12 @@ export class AuthServices {
     return isMatched
   }
 
-  async saveRefreshToken(userId: number, refresh_token: string) {
-    const result = await this.userRepo.update({ id: userId }, { refresh_token })
+  async saveHashToken(userId: number, refresh_token: string) {
+    const hashRt = await this.hashPassword(refresh_token)
+    const result = await this.userRepo.update(
+      { id: userId },
+      { refresh_token: hashRt }
+    )
     if (result.affected === 0) {
       throw new NotFoundException(messageResponse.NOT_FOUND_USER)
     }
