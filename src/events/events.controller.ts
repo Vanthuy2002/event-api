@@ -15,7 +15,7 @@ import {
 import { CreateEventDTO, UpdateEventsDTO } from './dto'
 import { EventsService } from './events.service'
 import { ListEvents } from './input/event.filter'
-import { PaginationOptions } from './input/pagination'
+import { Pagination, PaginationOptions } from './input/pagination'
 import { CurrentUser } from 'src/auth/decorator/user.decorator'
 import { User } from 'src/auth/entity'
 import { AuthGuardJwt } from 'src/auth/guards/authGuard'
@@ -27,6 +27,7 @@ export class EventsController {
   private readonly logger = new Logger(EventsController.name)
   constructor(private readonly eventService: EventsService) {}
 
+  @Serializer(Pagination)
   @Get()
   findAll(
     @Query(new ValidationPipe({ transform: true })) paginate: PaginationOptions,

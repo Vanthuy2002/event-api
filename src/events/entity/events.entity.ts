@@ -44,7 +44,6 @@ export class Events {
   organizer: User
 
   @Column({ nullable: true })
-  @Expose()
   organizer_id: number
 
   @Expose()

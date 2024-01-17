@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer'
 import { SelectQueryBuilder } from 'typeorm'
 
 export interface PaginationOptions {
@@ -5,11 +6,19 @@ export interface PaginationOptions {
   limit: number
 }
 
-export interface Pagination<T> {
+export class Pagination<T> {
+  constructor(partial: Partial<Pagination<T>>) {
+    Object.assign(this, partial)
+  }
+  @Expose()
   limit: number
+  @Expose()
   page: number
+  @Expose()
   total: number
+  @Expose()
   total_pages: number
+  @Expose()
   data: T[]
 }
 
@@ -25,11 +34,11 @@ export async function paginateHandler<T>(
 
   const total_pages = Math.ceil(count / options.limit)
 
-  return {
+  return new Pagination({
     data,
     page: options.page,
     limit: options.limit,
     total: count,
     total_pages
-  }
+  })
 }

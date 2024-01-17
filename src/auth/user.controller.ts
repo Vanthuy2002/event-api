@@ -7,7 +7,7 @@ import {
   ParseIntPipe,
   Post
 } from '@nestjs/common'
-import { CreateUserDto, UserDto } from './dto'
+import { CreateUserDto } from './dto'
 import { AuthServices } from './auth.service'
 import { User } from './entity'
 import { messageResponse } from 'src/utils/message'
@@ -48,14 +48,13 @@ export class UserController {
   }
 
   // for admin
-
-  @Serializer(UserDto)
+  @Serializer(User)
   @Get('admin')
   async getUserForAdmin() {
     return await this.userRepo.find({})
   }
 
-  @Serializer(UserDto)
+  @Serializer(User)
   @Get('admin/:id')
   async getOneUser(@Param('id', ParseIntPipe) id: number) {
     return await this.userRepo.findOneBy({ id })
