@@ -1,10 +1,20 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post
+} from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { AuthServices } from './auth.service'
 import { User } from './entity'
 import { messageResponse } from 'src/utils/message'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { Serializer } from 'src/interceptors/serialize'
+import { UserDto } from './dto/get-user.dto'
 
 @Controller('user')
 export class UserController {
@@ -36,5 +46,19 @@ export class UserController {
     return {
       message: messageResponse.REGISTER
     }
+  }
+
+  // for admin
+
+  @Serializer(UserDto)
+  @Get('admin')
+  async getUserForAdmin() {
+    return await this.userRepo.find({})
+  }
+
+  @Serializer(UserDto)
+  @Get('admin/:id')
+  async getOneUser(@Param('id', ParseIntPipe) id: number) {
+    return await this.userRepo.findOneBy({ id })
   }
 }
