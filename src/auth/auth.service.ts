@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { messageResponse } from 'src/utils/message'
+import { Response } from 'express'
 
 @Injectable()
 export class AuthServices {
@@ -35,18 +36,33 @@ export class AuthServices {
     return isMatched
   }
 
-  async saveHashToken(userId: number, refresh_token: string) {
-    const hashRt = await this.hashString(refresh_token)
-    const result = await this.userRepo.update(
-      { id: userId },
-      { refresh_token: hashRt }
-    )
+  async handleLogin(user: User, res: Response) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.generateToken(user),
+      this.generateToken(user, process.env.TOKEN_REFRESH_EXPIRED)
+    ])
+    await this.saveRefreshToken(user.id, refresh_token)
+    res.cookie('token', refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production' ? true : false,
+      sameSite: 'none',
+      expires: new Date(Date.now() + 1 * 24 * 60 * 1000)
+    })
+
+    return {
+      access_token,
+      refresh_token
+    }
+  }
+
+  async saveRefreshToken(userId: number, refresh_token: string) {
+    const result = await this.userRepo.update({ id: userId }, { refresh_token })
     if (result.affected === 0) {
       throw new NotFoundException(messageResponse.NOT_FOUND_USER)
     }
   }
 
-  async removeHashToken(id: number) {
+  async logoutUser(id: number) {
     // remove access_token in client first
     // remove refresh_token in DB
     const result = await this.userRepo.update({ id }, { refresh_token: null })
@@ -54,17 +70,12 @@ export class AuthServices {
       throw new ForbiddenException(null, messageResponse.PERMISSION)
   }
 
-  async handleRefreshToken({ id, token }: { id: number; token: string }) {
-    // find user
+  async handleRefreshToken(id: number) {
     const user = await this.userRepo.findOne({
       where: { id },
-      select: { username: true, id: true, refresh_token: true }
+      select: { id: true, username: true }
     })
-    // compare token
-    const isMatched = await this.compareString(token, user.refresh_token)
-    if (!isMatched) throw new ForbiddenException(messageResponse.PERMISSION)
-
-    // return new access_token
+    if (!user) throw new ForbiddenException(null, messageResponse.PERMISSION)
     const access_token = await this.generateToken(user)
     return { access_token }
   }

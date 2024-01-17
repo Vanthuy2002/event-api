@@ -1,10 +1,18 @@
-import { Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UseGuards
+} from '@nestjs/common'
 import { AuthServices } from './auth.service'
 import { CurrentUser } from './decorator'
 import { User } from './entity'
 import { AuthGuardJwt, AuthGuardLocal, AuthGuardRT } from './guards/authGuard'
 import { HttpCodeStatus } from 'src/utils/httpStatus'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -12,40 +20,35 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(AuthGuardLocal)
-  async login(@CurrentUser() user: User) {
-    const [access_token, refresh_token] = await Promise.all([
-      this.authService.generateToken(user),
-      this.authService.generateToken(user, process.env.TOKEN_REFRESH_EXPIRED)
-    ])
-    await this.authService.saveHashToken(user.id, refresh_token)
-    return {
-      access_token,
-      refresh_token
-    }
-  }
-
-  @Post('logout')
-  @UseGuards(AuthGuardJwt)
-  @HttpCode(HttpCodeStatus.NOTHING)
-  async logout(@CurrentUser() user: User) {
-    return await this.authService.removeHashToken(user.id)
+  async login(
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return await this.authService.handleLogin(user, res)
   }
 
   @Get('whoami')
-  @UseGuards(AuthGuardJwt)
+  @UseGuards(AuthGuardJwt) // access_token
   @HttpCode(HttpCodeStatus.OK)
   async whoAmI(@CurrentUser() user: User) {
     return user
   }
 
+  @Post('logout')
+  @UseGuards(AuthGuardRT) // refresh_token
+  @HttpCode(HttpCodeStatus.NOTHING)
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = req.user
+    const result = await this.authService.logoutUser(user['sub'])
+    res.clearCookie('token', { httpOnly: true })
+    return result
+  }
+
   @Get('refresh')
-  @UseGuards(AuthGuardRT)
+  @UseGuards(AuthGuardRT) // refresh_token
   @HttpCode(HttpCodeStatus.OK)
   async refreshToken(@Req() req: Request) {
     const user = req.user
-    return await this.authService.handleRefreshToken({
-      id: user['sub'],
-      token: user['refresh_token']
-    })
+    return await this.authService.handleRefreshToken(user['sub'])
   }
 }
