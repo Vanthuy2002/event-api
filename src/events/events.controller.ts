@@ -9,32 +9,40 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards
+  UseGuards,
+  ValidationPipe
 } from '@nestjs/common'
-import { CreateEventDTO } from './dto/create-event.dto'
-import { UpdateEventsDTO } from './dto/update-event.dto'
+import { CreateEventDTO, UpdateEventsDTO } from './dto'
 import { EventsService } from './events.service'
 import { ListEvents } from './input/event.filter'
 import { PaginationOptions } from './input/pagination'
 import { CurrentUser } from 'src/auth/decorator/user.decorator'
-import { User } from 'src/auth/entity/user.entity'
+import { User } from 'src/auth/entity'
 import { AuthGuardJwt } from 'src/auth/guards/authGuard'
+import { Serializer } from 'src/interceptors/serialize'
+import { Events } from './entity/events.entity'
 
 @Controller('events')
 export class EventsController {
   private readonly logger = new Logger(EventsController.name)
   constructor(private readonly eventService: EventsService) {}
+
   @Get()
-  findAll(@Query() paginate: PaginationOptions, @Query() filter?: ListEvents) {
+  findAll(
+    @Query(new ValidationPipe({ transform: true })) paginate: PaginationOptions,
+    @Query() filter?: ListEvents
+  ) {
     this.logger.log(`Hit sent a request`)
     return this.eventService.findAll(paginate, filter)
   }
 
+  @Serializer(Events)
   @Get('practive')
   async findWithRelation() {
     return this.eventService.getPrative()
   }
 
+  @Serializer(Events)
   @Get(':id')
   findById(@Param('id', ParseIntPipe) id: number) {
     return this.eventService.findById(id)

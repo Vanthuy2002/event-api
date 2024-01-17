@@ -1,8 +1,8 @@
 import { SelectQueryBuilder } from 'typeorm'
 
 export interface PaginationOptions {
-  page: string
-  limit: string
+  page: number
+  limit: number
 }
 
 export interface Pagination<T> {
@@ -17,21 +17,18 @@ export async function paginateHandler<T>(
   handler: SelectQueryBuilder<T>,
   options: PaginationOptions
 ): Promise<Pagination<T>> {
-  const PAGE = parseInt(options.page)
-  const LIMIT = parseInt(options.limit)
-
-  const offset = (PAGE - 1) * LIMIT
+  const offset = (options.page - 1) * options.limit
   const [data, count] = await Promise.all([
-    handler.offset(offset).limit(LIMIT).getMany(),
+    handler.offset(offset).limit(options.limit).getMany(),
     handler.getCount()
   ])
 
-  const total_pages = Math.ceil(count / LIMIT)
+  const total_pages = Math.ceil(count / options.limit)
 
   return {
     data,
-    page: PAGE,
-    limit: LIMIT,
+    page: options.page,
+    limit: options.limit,
     total: count,
     total_pages
   }

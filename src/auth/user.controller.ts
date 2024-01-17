@@ -7,14 +7,13 @@ import {
   ParseIntPipe,
   Post
 } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
+import { CreateUserDto, UserDto } from './dto'
 import { AuthServices } from './auth.service'
 import { User } from './entity'
 import { messageResponse } from 'src/utils/message'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Serializer } from 'src/interceptors/serialize'
-import { UserDto } from './dto/get-user.dto'
 
 @Controller('user')
 export class UserController {
