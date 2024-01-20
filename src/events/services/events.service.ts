@@ -5,15 +5,13 @@ import {
   NotFoundException
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Events } from './entity/events.entity'
 import { DeleteResult, Repository } from 'typeorm'
-import { UpdateEventsDTO } from './dto/update-event.dto'
-import { CreateEventDTO } from './dto/create-event.dto'
+import { UpdateEventsDTO, CreateEventDTO } from '../dto'
 import { messageResponse } from 'src/utils/message'
-import { Attendee, AttendeeAnwsers } from './entity/attendee.entity'
-import { ListEvents, WhenEventFilter } from './input/event.filter'
-import { PaginationOptions, paginateHandler } from './input/pagination'
-import { User } from 'src/auth/entity/user.entity'
+import { Attendee, AttendeeAnwsers, Events } from '../entity'
+import { ListEvents, WhenEventFilter } from '../input/event.filter'
+import { PaginationOptions, paginateHandler } from '../input/pagination'
+import { User } from 'src/auth/entity'
 
 @Injectable()
 export class EventsService {
@@ -144,5 +142,21 @@ export class EventsService {
     await this.repo.save(event)
 
     return event
+  }
+
+  async getEventOganizerByUserIdPagination(
+    userId: number,
+    paginationOptions: PaginationOptions
+  ) {
+    return await paginateHandler<Events>(
+      await this.getEventOganizerByUserId(userId),
+      paginationOptions
+    )
+  }
+
+  async getEventOganizerByUserId(userId: number) {
+    return this.getEventBaseQuery().where('e.organizer_id = :userId', {
+      userId
+    })
   }
 }

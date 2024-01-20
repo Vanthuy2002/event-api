@@ -12,15 +12,15 @@ import {
   UseGuards,
   ValidationPipe
 } from '@nestjs/common'
-import { CreateEventDTO, UpdateEventsDTO } from './dto'
-import { EventsService } from './events.service'
-import { ListEvents } from './input/event.filter'
-import { Pagination, PaginationOptions } from './input/pagination'
+import { CreateEventDTO, UpdateEventsDTO } from '../dto'
+import { EventsService } from '../services'
+import { ListEvents } from '../input/event.filter'
+import { Pagination, PaginationOptions } from '../input/pagination'
 import { CurrentUser } from 'src/auth/decorator/user.decorator'
 import { User } from 'src/auth/entity'
 import { AuthGuardJwt } from 'src/auth/guards/authGuard'
 import { Serializer } from 'src/interceptors/serialize'
-import { Events } from './entity/events.entity'
+import { Events } from '../entity'
 
 @Controller('events')
 export class EventsController {
