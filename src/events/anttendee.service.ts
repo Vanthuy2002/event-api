@@ -1,0 +1,19 @@
+import { InjectRepository } from '@nestjs/typeorm'
+import { Attendee } from './entity'
+import { Repository } from 'typeorm'
+import { Injectable } from '@nestjs/common'
+
+@Injectable()
+export class AnttendeeService {
+  constructor(
+    @InjectRepository(Attendee)
+    private readonly repository: Repository<Attendee>
+  ) {}
+
+  async findEventByIds(eventId: number): Promise<Attendee[]> {
+    const events = await this.repository.find({
+      where: { event: { id: eventId } }
+    })
+    return events
+  }
+}
