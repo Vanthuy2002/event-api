@@ -11,6 +11,7 @@ import {
 import { Profile } from './profile.entity'
 import { Events } from 'src/events/entity/events.entity'
 import { Expose } from 'class-transformer'
+import { Attendee } from 'src/events/entity'
 
 @Entity()
 export class User {
@@ -39,6 +40,9 @@ export class User {
   @OneToMany(() => Events, (event) => event.organizer)
   @Expose()
   organized: Events[]
+
+  @OneToMany(() => Attendee, (att) => att.user)
+  atendeed: Attendee[]
 
   @CreateDateColumn()
   createdAt: Date

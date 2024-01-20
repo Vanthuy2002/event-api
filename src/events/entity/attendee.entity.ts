@@ -8,6 +8,7 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import { Events } from './events.entity'
+import { User } from 'src/auth/entity'
 
 export enum AttendeeAnwsers {
   Agreed = 'agree',
@@ -34,6 +35,9 @@ export class Attendee {
     default: AttendeeAnwsers.Pending
   })
   answers: AttendeeAnwsers
+
+  @ManyToOne(() => User, (user) => user.atendeed)
+  user: User
 
   @CreateDateColumn()
   createdAt: Date
