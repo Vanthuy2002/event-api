@@ -4,7 +4,7 @@ import { Strategy } from 'passport-local'
 import { Repository } from 'typeorm'
 import { User } from '../entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { messageResponse } from 'src/utils/message'
+import { messageResponse } from '../../utils/message'
 import { AuthServices } from '../auth.service'
 
 @Injectable()

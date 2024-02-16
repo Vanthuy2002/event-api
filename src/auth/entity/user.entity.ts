@@ -9,9 +9,9 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import { Profile } from './profile.entity'
-import { Events } from 'src/events/entity/events.entity'
+import { Events } from '../../events/entity/events.entity'
 import { Expose } from 'class-transformer'
-import { Attendee } from 'src/events/entity'
+import { Attendee } from '../../events/entity'
 
 @Entity()
 export class User {

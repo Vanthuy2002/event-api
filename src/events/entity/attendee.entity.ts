@@ -8,7 +8,7 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import { Events } from './events.entity'
-import { User } from 'src/auth/entity'
+import { User } from '../../auth/entity'
 import { Expose } from 'class-transformer'
 
 export enum AttendeeAnwsers {

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { EventsModule } from 'src/events'
+import { EventsModule } from './../events'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppJapanService } from './app.japanese'
 import { AppDummy } from './app.dummy'
 import { ConfigModule } from '@nestjs/config'
-import ormConfig from 'src/config/orm.config'
-import { SchoolModule } from 'src/school/school.module'
-import { AuthModule } from 'src/auth/auth.module'
+import ormConfig from './../config/orm.config'
+import { SchoolModule } from './../school/school.module'
+import { AuthModule } from './../auth/auth.module'
 
 @Module({
   imports: [

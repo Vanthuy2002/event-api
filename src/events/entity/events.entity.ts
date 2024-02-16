@@ -9,7 +9,7 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import { Attendee } from './attendee.entity'
-import { User } from 'src/auth/entity/user.entity'
+import { User } from '../../auth/entity'
 import { Expose } from 'class-transformer'
 
 @Entity()

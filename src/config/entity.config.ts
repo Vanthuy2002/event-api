@@ -1,9 +1,9 @@
-import { Profile } from 'src/auth/entity/profile.entity'
-import { User } from 'src/auth/entity/user.entity'
-import { Attendee } from 'src/events/entity/attendee.entity'
-import { Events } from 'src/events/entity/events.entity'
-import { Subject } from 'src/school/subject.entity'
-import { Teacher } from 'src/school/teacher.entity'
+import { Profile } from './../auth/entity/profile.entity'
+import { User } from './../auth/entity/user.entity'
+import { Attendee } from './../events/entity/attendee.entity'
+import { Events } from './../events/entity/events.entity'
+import { Subject } from './../school/subject.entity'
+import { Teacher } from './../school/teacher.entity'
 
 export const entitiesConfig = [
   Profile,

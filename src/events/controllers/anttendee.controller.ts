@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common'
 import { AnttendeeService } from '../services'
-import { Serializer } from 'src/interceptors/serialize'
+import { Serializer } from '../../interceptors/serialize'
 import { Attendee } from '../entity'
 
 @Controller('events/:id/anttendee')

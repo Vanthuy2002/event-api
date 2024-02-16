@@ -8,7 +8,7 @@ import { User } from './entity'
 import * as bcrypt from 'bcrypt'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { messageResponse } from 'src/utils/message'
+import { messageResponse } from './../utils/message'
 import { Response } from 'express'
 
 @Injectable()

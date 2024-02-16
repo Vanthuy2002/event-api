@@ -7,11 +7,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { DeleteResult, Repository } from 'typeorm'
 import { UpdateEventsDTO, CreateEventDTO } from '../dto'
-import { messageResponse } from 'src/utils/message'
+import { messageResponse } from '../../utils/message'
 import { Attendee, AttendeeAnwsers, Events } from '../entity'
 import { ListEvents, WhenEventFilter } from '../input/event.filter'
 import { PaginationOptions, paginateHandler } from '../input/pagination'
-import { User } from 'src/auth/entity'
+import { User } from '../../auth/entity'
 
 @Injectable()
 export class EventsService {

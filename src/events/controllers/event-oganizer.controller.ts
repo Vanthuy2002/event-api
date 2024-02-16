@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import { EventsService } from '../services'
 import { Pagination, PaginationOptions } from '../input/pagination'
-import { Serializer } from 'src/interceptors/serialize'
+import { Serializer } from '../../interceptors/serialize'
 
 @Controller('events-oganizers/:id')
 export class EventOganizerController {

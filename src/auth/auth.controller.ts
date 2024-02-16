@@ -11,7 +11,7 @@ import { AuthServices } from './auth.service'
 import { CurrentUser } from './decorator'
 import { User } from './entity'
 import { AuthGuardJwt, AuthGuardLocal, AuthGuardRT } from './guards/authGuard'
-import { HttpCodeStatus } from 'src/utils/httpStatus'
+import { HttpCodeStatus } from './../utils/httpStatus'
 import { Request, Response } from 'express'
 
 @Controller('auth')

@@ -10,10 +10,10 @@ import {
 import { CreateUserDto } from './dto'
 import { AuthServices } from './auth.service'
 import { User } from './entity'
-import { messageResponse } from 'src/utils/message'
+import { messageResponse } from '../utils/message'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { Serializer } from 'src/interceptors/serialize'
+import { Serializer } from '../interceptors/serialize'
 
 @Controller('user')
 export class UserController {
