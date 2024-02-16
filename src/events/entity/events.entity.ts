@@ -14,6 +14,9 @@ import { Expose } from 'class-transformer'
 
 @Entity()
 export class Events {
+  constructor(partial?: Partial<Events>) {
+    Object.assign(this, partial)
+  }
   @PrimaryGeneratedColumn()
   @Expose()
   id?: number
