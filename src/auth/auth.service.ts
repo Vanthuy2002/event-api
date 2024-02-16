@@ -44,7 +44,7 @@ export class AuthServices {
     await this.saveRefreshToken(user.id, refresh_token)
     res.cookie('token', refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? true : false,
+      secure: true,
       sameSite: 'none',
       expires: new Date(Date.now() + 1 * 24 * 60 * 1000)
     })

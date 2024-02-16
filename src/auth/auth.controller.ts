@@ -40,7 +40,7 @@ export class AuthController {
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user
     const result = await this.authService.logoutUser(user['sub'])
-    res.clearCookie('token', { httpOnly: true })
+    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'none' })
     return result
   }
 
